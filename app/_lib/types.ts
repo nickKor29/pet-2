@@ -11,3 +11,6 @@ export type User = {
   image: string;
   toursIds: number[];
 };
+export type Session = {
+  user: User;
+};

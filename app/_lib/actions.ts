@@ -31,10 +31,17 @@ export async function participateInTourAction(tourId: string) {
 }
 export async function addReview(review: Review) {
   const session = await auth();
-
+  if (!session) return;
+  const user = session.user as {
+    userId: number;
+    name: string;
+    email: string;
+    image: string;
+    toursIds: number[];
+  };
   await addComment({
     ...review,
-    userId: session?.user?.userId,
+    userId: user.userId,
     tourId: Number(review.tourId),
   });
   revalidatePath(`/tours/${review.tourId}`);

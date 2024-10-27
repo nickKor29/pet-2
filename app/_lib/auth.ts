@@ -1,12 +1,7 @@
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 import { createUser, getUser } from "./data-service";
-
-type User = {
-  name: string;
-  email: string;
-  image?: string;
-};
+import { User } from "./types";
 
 const authConfig = {
   providers: [
@@ -19,7 +14,7 @@ const authConfig = {
     authorized({ auth }: { auth: { user?: User } }) {
       return !!auth?.user;
     },
-    async signIn({ user }) {
+    async signIn({ user }: { user: User }) {
       try {
         const existingGuest = await getUser(user.email);
         console.log(existingGuest);

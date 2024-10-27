@@ -4,3 +4,10 @@ export type Review = {
   tourId: number | string;
   userId?: number;
 };
+export type User = {
+  userId: number;
+  name: string;
+  email: string;
+  image: string;
+  toursIds: number[];
+};

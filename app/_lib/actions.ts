@@ -15,7 +15,8 @@ export async function updateProfileAction(formData: FormData) {
   const fullName = formData.get("fullName") as string;
   const phoneNumber = formData.get("phoneNumber") as string;
   const updateData = { fullName, phoneNumber };
-  await updateProfile(updateData, session?.user?.userId);
+  const user = session.user as { userId: number };
+  await updateProfile(updateData, user.userId);
   revalidatePath("/account/profile");
 }
 export async function participateInTourAction(tourId: string) {
@@ -24,12 +25,7 @@ export async function participateInTourAction(tourId: string) {
 }
 export async function addReview(review: Review) {
   const session = await auth();
-  console.log("FORMDATA");
-  console.log({
-    ...review,
-    userId: session?.user?.userId,
-    tourId: Number(review.tourId),
-  });
+
   await addComment({
     ...review,
     userId: session?.user?.userId,

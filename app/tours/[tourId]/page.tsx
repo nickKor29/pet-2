@@ -6,6 +6,7 @@ import ReviewsSection from "@/app/_components/ReviewsSection";
 import SignUpTour from "@/app/_components/SignUpTour";
 import { auth } from "@/app/_lib/auth";
 import { getReviews, getTour, getTours } from "@/app/_lib/data-service";
+import { User } from "@/app/_lib/types";
 interface Params {
   tourId: string;
 }
@@ -28,6 +29,7 @@ export default async function Page({ params }: { params: Params }) {
   );
   console.log(reviews);
   const session = await auth();
+  const user = session?.user as User;
   const {
     id,
     title,
@@ -139,7 +141,7 @@ export default async function Page({ params }: { params: Params }) {
           </p>
           {new Date() < new Date(startDate) &&
             session?.user &&
-            !session?.user?.toursIds?.includes(id) &&
+            user?.toursIds?.includes(id) &&
             currentParticipants < maxParticipants && (
               <SignUpTour tourId={params.tourId} />
             )}
@@ -156,22 +158,21 @@ export default async function Page({ params }: { params: Params }) {
         </div>
       </div>
       {showReviews && <ReviewsSection reviews={approvedReviews} />}
-      {session?.user?.toursIds?.includes(id) &&
+      {user?.toursIds?.includes(id) &&
         new Date() > new Date(endDate) &&
-        !reviews.some((review) => review.userId === session?.user?.userId) && (
+        !reviews.some((review) => review.userId === user?.userId) && (
           <AddReview tourId={params.tourId} />
         )}
 
-      {session?.user?.toursIds.includes(id) &&
-        new Date() < new Date(endDate) && (
-          <p className="text-lg p-2 bg-accent-600 text-accent-50 text-center">
-            Вы участвуете в этом туре. Оставить отзыв можно будет после его
-            завершения.
-          </p>
-        )}
+      {user?.toursIds.includes(id) && new Date() < new Date(endDate) && (
+        <p className="text-lg p-2 bg-accent-600 text-accent-50 text-center">
+          Вы участвуете в этом туре. Оставить отзыв можно будет после его
+          завершения.
+        </p>
+      )}
       {reviews.some(
         (review) =>
-          review.userId === session?.user?.userId && review.status === "Ожидает"
+          review.userId === user?.userId && review.status === "Ожидает"
       ) && (
         <p className="text-lg p-2 bg-accent-600 text-accent-50 text-center">
           Вы написали свой отзыв, он будет опубликован после модерации

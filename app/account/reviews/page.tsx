@@ -1,6 +1,7 @@
 import ReviewCard from "@/app/_components/ReviewCard";
 import { auth } from "@/app/_lib/auth";
 import { getReviewsById } from "@/app/_lib/data-service";
+import { User } from "@/app/_lib/types";
 
 export const metadata = {
   title: "Мои отзывы",
@@ -8,7 +9,8 @@ export const metadata = {
 
 export default async function Page() {
   const session = await auth();
-  const reviews = await getReviewsById(session?.user?.userId);
+  const user = session?.user as User;
+  const reviews = await getReviewsById(user?.userId);
   console.log(reviews);
   return (
     <div>

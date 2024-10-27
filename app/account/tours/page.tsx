@@ -1,13 +1,14 @@
 import TourCard from "@/app/_components/TourCard";
 import { auth } from "@/app/_lib/auth";
 import { getUserTours } from "@/app/_lib/data-service";
-
+import { User } from "@/app/_lib/types";
 export const metadata = {
   title: "Мои туры",
 };
 export default async function Page() {
   const session = await auth();
-  const tours = await getUserTours(session?.user?.toursIds);
+  const user = session?.user as User;
+  const tours = await getUserTours(user?.toursIds);
   console.log(tours);
 
   return (

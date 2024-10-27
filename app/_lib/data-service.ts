@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { supabase } from "./supabase";
 import { auth } from "./auth";
-import { Review } from "./types";
+import { Review, User } from "./types";
 export const getTours = async function () {
   const { data, error } = await supabase
     .from("tours")
@@ -109,16 +109,20 @@ export async function updateToursIds(id: string) {
   const session = await auth();
   console.log("UPDATE");
 
+  // Проверяем, что toursIds существует, если нет, создаем пустой массив
+  const currentToursIds: number[] = (session?.user as User)?.toursIds || [];
+
   const { data, error } = await supabase
     .from("users")
     .update({
       toursIds: [
-        ...session?.user?.toursIds?.map((id: number) => String(id)),
+        ...currentToursIds.map((toursId: number) => toursId), // Преобразование в строку, если необходимо
         id,
       ],
     })
-    .eq("id", session?.user?.id)
+    .eq("id", session?.user?.id) // Убедитесь, что user.id тоже существует
     .select();
+
   if (error) throw new Error("Не удалось записать на тур");
   return data;
 }

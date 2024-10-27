@@ -1,9 +1,10 @@
-import NextAuth from "next-auth";
+import NextAuth, { NextAuthOptions } from "next-auth";
 import Google from "next-auth/providers/google";
 import { createUser, getUser } from "./data-service";
-import { Session, User } from "./types";
+import { User } from "./types";
 
-const authConfig = {
+// Определяем конфигурацию NextAuth с типами
+const authConfig: NextAuthOptions = {
   providers: [
     Google({
       clientId: process.env.AUTH_GOOGLE_ID!,
@@ -11,10 +12,11 @@ const authConfig = {
     }),
   ],
   callbacks: {
+    // Изменяем тип auth на правильный
     authorized({ auth }: { auth: { user?: User } }) {
       return !!auth?.user;
     },
-    async signIn({ user }: { user: User }) {
+    async signIn({ user }) {
       try {
         const existingGuest = await getUser(user.email);
         console.log(existingGuest);
@@ -22,13 +24,12 @@ const authConfig = {
           const newUser = { email: user.email, fullName: user.name };
           await createUser(newUser);
         }
-
         return true;
       } catch {
         return false;
       }
     },
-    async session({ session }: { session: Session }) {
+    async session({ session }) {
       const user = await getUser(session.user.email);
       session.user.userId = user.id;
       session.user.toursIds = user.toursIds;

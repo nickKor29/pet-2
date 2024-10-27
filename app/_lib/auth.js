@@ -1,21 +1,19 @@
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 import { createUser, getUser } from "./data-service";
-import { Session, User } from "./types";
 
-// Установите authConfig с типом any для временного решения ошибок
-const authConfig: any = {
+const authConfig = {
   providers: [
     Google({
-      clientId: process.env.AUTH_GOOGLE_ID!,
-      clientSecret: process.env.AUTH_GOOGLE_SECRET!,
+      clientId: process.env.AUTH_GOOGLE_ID,
+      clientSecret: process.env.AUTH_GOOGLE_SECRET,
     }),
   ],
   callbacks: {
-    authorized({ auth }: { auth: { user?: any } }) {
+    authorized({ auth }) {
       return !!auth?.user;
     },
-    async signIn({ user }: { user: any }) {
+    async signIn({ user }) {
       try {
         const existingGuest = await getUser(user.email);
         console.log(existingGuest);
@@ -23,16 +21,17 @@ const authConfig: any = {
           const newUser = { email: user.email, fullName: user.name };
           await createUser(newUser);
         }
+
         return true;
       } catch {
         return false;
       }
     },
-    async session({ session }: { session: any }) {
+    async session({ session }) {
       const user = await getUser(session.user.email);
+      console.log(user);
       session.user.userId = user.id;
       session.user.toursIds = user.toursIds;
-      console.log("SESSION");
       console.log(session);
       return session;
     },
@@ -42,7 +41,6 @@ const authConfig: any = {
   },
 };
 
-// Экспортируйте обработчики для NextAuth
 export const {
   auth,
   signIn,

@@ -15,7 +15,13 @@ export async function updateProfileAction(formData: FormData) {
   const fullName = formData.get("fullName") as string;
   const phoneNumber = formData.get("phoneNumber") as string;
   const updateData = { fullName, phoneNumber };
-  const user = session.user as { userId: number };
+  const user = session.user as {
+    userId: number;
+    name: string;
+    email: string;
+    image: string;
+    toursIds: number[];
+  };
   await updateProfile(updateData, user.userId);
   revalidatePath("/account/profile");
 }
